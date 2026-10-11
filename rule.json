@@ -1,0 +1,27 @@
+{
+  "name": "IIS worker process spawning a command shell",
+  "description": "Lab rule for the CTIA webshell-iis-001 scenario. The IIS worker process w3wp.exe started cmd.exe three times inside five minutes on one web server, and every command line was reconnaissance (whoami, net user /domain, systeminfo). A web server that serves HTTP should not be launching command shells at all, so this pair is the web-shell fingerprint: an attacker uploaded a script through the web and is now running operating-system commands through the application pool. The query is the same one the investigation uses, so the count the alert reports and the count you find by hand are the same number. Left without a threshold, deliberately: this lab ships historical data and every one of the three records has to arrive as its own alert, so that the count on the Alerts page and the count in the Documents tab can be compared line for line. A production rule would usually be a threshold query on any web-server process spawning cmd.exe or powershell.exe, would not be scoped to one host, and would run on a short window; the time window here is deliberately long because the lab data is from September 2026, which is a lab-only concession and not a production setting.",
+  "type": "query",
+  "risk_score": 99,
+  "severity": "critical",
+  "tags": [
+    "ctia-lab",
+    "iis",
+    "web-shell",
+    "command-and-control",
+    "detection-engineering"
+  ],
+  "enabled": true,
+  "interval": "1m",
+  "from": "now-365d",
+  "to": "now",
+  "index": [
+    "auth-*"
+  ],
+  "timeField": "@timestamp",
+  "query": "event.code: 4688 and process.parent.name: \"w3wp.exe\" and process.name: \"cmd.exe\"",
+  "language": "kuery",
+  "max_signals": 100,
+  "actions": [],
+  "notify_when": "onActiveAlert"
+}

@@ -1,0 +1,27 @@
+{
+  "name": "Compromised web server calling out over HTTPS",
+  "description": "Second lab rule for the CTIA webshell-iis-001 scenario, and the second half of the alert: three minutes after the last web-shell command, the same server opened outbound HTTPS to a single unfamiliar external address, and then again six minutes later. Small payloads on port 443, twice, to the same destination, in that order - a beacon home to a controller, not ordinary web traffic. It is scoped to the compromised host on purpose so the result is unambiguous and so it matches the last query of the investigation exactly: the alert count and the Documents count have to be the same number, or one of them is wrong. Left without a threshold so each of the two connections arrives as its own alert. A production rule would instead be a threshold query over any server making outbound connections to a destination it has no reason to call, run on a short window, with the destination list fed by a threat feed; the long time window here is a lab-only concession because this lab ships historical data from September 2026.",
+  "type": "query",
+  "risk_score": 73,
+  "severity": "high",
+  "tags": [
+    "ctia-lab",
+    "iis",
+    "command-and-control",
+    "c2-beacon",
+    "detection-engineering"
+  ],
+  "enabled": true,
+  "interval": "1m",
+  "from": "now-365d",
+  "to": "now",
+  "index": [
+    "network-*"
+  ],
+  "timeField": "@timestamp",
+  "query": "network.protocol: \"https\" and source.ip: \"10.0.4.21\"",
+  "language": "kuery",
+  "max_signals": 100,
+  "actions": [],
+  "notify_when": "onActiveAlert"
+}
